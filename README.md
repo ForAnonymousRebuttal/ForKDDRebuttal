@@ -5,7 +5,7 @@ This is a temporary page to present additional experiment results and analysis f
 Currently this page contains extra rebuttal contents of <b>submission 1763 *Team up GBDTs and DNNs: Advancing Efficient and Effective Tabular Prediction with Tree-hybrid MLPs*</b> in KDD 24'. <b>All used reference No. follow the original ones in the paper</b> if without specification.
 
 # 💬 To R twnd 
-<p style="text-align: center;"><b>QA3: Comparison on different imbalance-class scenarios</b></p>
+<p style="text-align: center;"><b>QA3: The average ranks (standard deviations) on different imbalance-level scenarios</b></p>
 
 |                          | XGBoost       | CatBoost  | MLP       | AutoInt   | DCNv2     | TabNet    | SAINT     | FT-T      | T-MLP     | T-MLP(3)      |
 | :----------------------- | :------------ | :-------- | :-------- | :-------- | :-------- | :-------- | :-------- | :-------- | :-------- | :------------ |
