@@ -1,12 +1,20 @@
-# For KDD24' Anonymous Rebuttal
+# For KDD24' Anonymous Rebuttal (Submission ID: 1763)
 
 This is a temporary page to present additional experiment results and analysis for anonymous rebuttal.
 
 Currently this page contains extra rebuttal contents of <b>submission 1763 *Team up GBDTs and DNNs: Advancing Efficient and Effective Tabular Prediction with Tree-hybrid MLPs*</b> in KDD 24'. <b>All used reference No. follow the original ones in the paper</b> if without specification.
 
 # 💬 To R twnd 
+<p style="text-align: center;"><b>QA3: Comparison on different imbalance-class scenarios</b></p>
 
-- xxx
+|                          | XGBoost       | CatBoost  | MLP       | AutoInt   | DCNv2     | TabNet    | SAINT     | FT-T      | T-MLP     | T-MLP(3)      |
+| :----------------------- | :------------ | :-------- | :-------- | :-------- | :-------- | :-------- | :-------- | :-------- | :-------- | :------------ |
+| $p < 0.33$ (32 datasets)  | 5\.0(3.0)     | 4\.8(3.2) | 6\.5(2.6) | 5\.4(2.5) | 5\.1(2.6) | 7\.7(2.8) | 6\.0(2.1) | 5\.0(2.4) | 5\.5(3.2) | **4\.1(2.5)** |
+| $p < 0.3$ (18 datasets)   | 5\.2(3.4)     | 4\.6(3.1) | 6\.7(2.6) | 4\.6(2.4) | 5\.3(2.6) | 7\.5(2.7) | 6\.9(2.2) | 4\.9(2.3) | 5\.3(3.3) | **3\.8(2.2)** |
+| $p < 0.125$ (12 datasets) | **4\.3(3.2)** | 4\.8(3.1) | 6\.4(3.1) | 4\.6(2.6) | 5\.5(2.7) | 7\.3(2.6) | 7\.3(1.5) | 4\.6(2.1) | 5\.8(3.4) | **4\.3(2.1)** |
+| $p < 0.05$ (4 datasets)   | **2\.5(1.0)** | 5\.8(3.3) | 5\.5(3.1) | 3\.5(3.0) | 5\.6(2.2) | 7\.5(3.7) | 7\.6(1.5) | 5\.3(2.5) | 6\.1(2.8) | 4\.8(2.5)     |
+
+**Analysis:** We reuse the recently released work TP-BERTa [2] which was comprehensively evaluated on imbalance-class scenarios with 32 highly imbalanced datasets from [CM2](https://arxiv.org/pdf/2307.04308.pdf). The $p$ denotes the minor-class proportions, i.e., $p=\frac{\text{min}(\# positive, \# negative)}{\# sample}$, indicating the imbalance level of a dataset. It can be clearly seen the ensemble version of T-MLP (T-MLP(3)) still holds its superiority on moderate class-imbalance situations. GBDTs dominates the performance in the extremely imbalanced situations (i.e., $p < 0.05$), but T-MLP(3) still outperforms most DNN baselines. Among DNNs, AutoInt[50] exhibits promising performances in the imbalance-class conditions, which may due to its capability of capturing patterns for minority class by manually combining original features to generate new features.
 
 # 💬 To R pAZD
 
