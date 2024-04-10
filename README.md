@@ -5,10 +5,16 @@ This is a temporary page to present additional experiment results and analysis f
 Currently this page contains extra rebuttal contents of <b>submission 1763 *Team up GBDTs and DNNs: Advancing Efficient and Effective Tabular Prediction with Tree-hybrid MLPs*</b> in KDD 24'. <b>All used reference No. follow the original ones in the paper</b> if without specification.
 
 **Anchors to detailed response materials**:
-- [To R twnd](#💬-To-R-twnd)
-- [To R pAZD](#💬-To-R-pAZD)
+- [💬 To R twnd](#twnd)
+- [💬 To R pAZD](#pAZD)
+- [💬 To R F2J2](#F2J2)
+- [💬 To R jHCg](#jHCg)
+- [💬 To R LYyH](#LYyH)
+- [💬 To R hswh](#hswh)
 
-# 💬-To-R-twnd 
+<a id="twnd"></a>
+
+# 💬 To R twnd 
 
 ## QA3: The average ranks (standard deviations) on different imbalance-level scenarios
 <!-- <p style="text-align: center;"><b></b></p> -->
@@ -22,7 +28,9 @@ Currently this page contains extra rebuttal contents of <b>submission 1763 *Team
 
 **Analysis:** We reuse the recently released work TP-BERTa [2] which was comprehensively evaluated on imbalance-class scenarios with 32 imbalanced binary classification datasets from [OPENTABS Database](https://arxiv.org/pdf/2307.04308.pdf). The $p$ denotes the minor-class proportions, i.e., $p=\frac{\text{min}(P, N)}{D}$ ($P$ is positive sample amount, $N$ is the negative one, and $D$ is the dataset size), indicating the imbalance level of a dataset. It can be clearly seen the ensemble version of T-MLP (T-MLP(3)) still holds its superiority on moderate class-imbalance situations. GBDTs dominates the performance in the extremely imbalanced situations (i.e., $p < 0.05$), but T-MLP(3) still outperforms most DNN baselines. Among DNNs, AutoInt[50] exhibits promising performances in the imbalance-class conditions, which may due to its capability of capturing patterns for minority class by manually combining original features to generate new features.
 
-# 💬-To-R-pAZD
+<a id="pAZD"></a>
+
+# 💬 To R pAZD
 
 <b>Q1: Constrained novelty since integration techniques from other fields (i.e., GBDT, vision MLPs, langue model pruning)?</b>
 
@@ -377,7 +385,7 @@ Similar trend is observed additionally conducted ablations on FT-Transformer (11
 
 ## Q5: How are the fixed hyperparameters initially determined? Fig. 2 exhibits different datasets prefer different sparsity level, are the two fine-grained variables, $z_h$ and $z_{in}$ (line 425-426), for sparsity fixed?
 
-A5: (1) Please refer to QA1 of R hswh on how we determine the hyperparameter values, the default ones are listed in the page bottom. (2) We would like to briefly clarity the **fundamental misunderstandings** here. The introduced $z_h$ and $z_{in}$ are learnable binary masks for masking the corresponding values on MLP weight matrices, which sizes are adaptively determined by the sizes of weight matrices. The true & only hyperparameter in sparsification operation is the target sparsity rate, once it is assigned, the method will promise to produce the two variables with the assigned sparsity rate (target ratio of non-zero values) using CoFi pruning [62]. Secondly, as you said (also shown in Fig. 2), datasets vary in appetite of sparsity rates, we provide win statistics of different sparsity rates on T2G benchmark:
+A5: (1) Please refer to QA1 of R hswh on how we determine the hyperparameter values, the default ones are listed in the [page bottom](#hswh). (2) We would like to briefly clarity the **fundamental misunderstandings** here. The introduced $z_h$ and $z_{in}$ are learnable binary masks for masking the corresponding values on MLP weight matrices, which sizes are adaptively determined by the sizes of weight matrices. The true & only hyperparameter in sparsification operation is the target sparsity rate, once it is assigned, the method will promise to produce the two variables with the assigned sparsity rate (target ratio of non-zero values) using CoFi pruning [62]. Secondly, as you said (also shown in Fig. 2), datasets vary in appetite of sparsity rates, we provide win statistics of different sparsity rates on T2G benchmark:
 
 <p><b>Win statistics of different T-MLP sparsity rates on 12 T2G datasets</b></p>
 
@@ -387,13 +395,19 @@ A5: (1) Please refer to QA1 of R hswh on how we determine the hyperparameter val
 
 Sparsity rate here means how many weights remaining after pruning. The above results show sparsity in T-MLP in often an improvement point, while excessive sparsity can also hurt performance. Therefore, to hold the strength of no hyperparameter tuning and lightweight storage, we keep a fixed sparsity rate of 33% for all datasets (line 449-450) considering both effectiveness and parameter compactness.
 
+<a id="F2J2"></a>
+
 # 💬 To R F2J2
 - *2021.10* Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet ipsum, ac tempus justo dapibus sit amet. 
 - *2021.09* Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet ipsum, ac tempus justo dapibus sit amet. 
 
+<a id="jHCg"></a>
+
 # 💬 To R jHCg
 - *2019.06 - 2022.04 (now)*, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet ipsum, ac tempus justo dapibus sit amet. 
 - *2015.09 - 2019.06*, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet ipsum, ac tempus justo dapibus sit amet. 
+
+<a id="LYyH"></a>
 
 # 💬 To R LYyH 
 
@@ -865,6 +879,7 @@ We will include more fine-grained parameter impact illustrations in the final ve
 
 - A: In this paper all baselines were conducted with uniform common feature preprocessing for fair comparison. We are willing to open a section for feature engineering experiments in the final version.
 
+<a id="hswh"></a>
 
 # 💬 To R hswh
 
