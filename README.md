@@ -493,8 +493,8 @@ To further inspect the impact of data characteristics on T-MLP performance, we c
 <a id="jHCg"></a>
 
 # 💬 To R jHCg
-- *2019.06 - 2022.04 (now)*, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet ipsum, ac tempus justo dapibus sit amet. 
-- *2015.09 - 2019.06*, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet ipsum, ac tempus justo dapibus sit amet. 
+
+N/A 
 
 <a id="LYyH"></a>
 
@@ -934,7 +934,7 @@ To further inspect the impact of data characteristics on T-MLP performance, we c
 
 ## QA4: Insufficient analysis on the impact of GBDT or MLP parameters?
 <p align="center">
-  <img src="img/xgb-hp-analysis.png" alt="sym" width="550">
+  <img src="img/xgb-hp-analysis.png" alt="sym" width="500">
     <figcaption style="text-align: center;">The imapct of decision tree count in XGBoost of T-MLP</figcaption>
 </p>
 
