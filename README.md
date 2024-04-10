@@ -4,7 +4,11 @@ This is a temporary page to present additional experiment results and analysis f
 
 Currently this page contains extra rebuttal contents of <b>submission 1763 *Team up GBDTs and DNNs: Advancing Efficient and Effective Tabular Prediction with Tree-hybrid MLPs*</b> in KDD 24'. <b>All used reference No. follow the original ones in the paper</b> if without specification.
 
-# 💬 To R twnd 
+**Anchors to detailed response materials**:
+- [To R twnd](#💬-To-R-twnd)
+- [To R pAZD](#💬-To-R-pAZD)
+
+# 💬-To-R-twnd 
 
 ## QA3: The average ranks (standard deviations) on different imbalance-level scenarios
 <!-- <p style="text-align: center;"><b></b></p> -->
@@ -18,7 +22,7 @@ Currently this page contains extra rebuttal contents of <b>submission 1763 *Team
 
 **Analysis:** We reuse the recently released work TP-BERTa [2] which was comprehensively evaluated on imbalance-class scenarios with 32 imbalanced binary classification datasets from [OPENTABS Database](https://arxiv.org/pdf/2307.04308.pdf). The $p$ denotes the minor-class proportions, i.e., $p=\frac{\text{min}(P, N)}{D}$ ($P$ is positive sample amount, $N$ is the negative one, and $D$ is the dataset size), indicating the imbalance level of a dataset. It can be clearly seen the ensemble version of T-MLP (T-MLP(3)) still holds its superiority on moderate class-imbalance situations. GBDTs dominates the performance in the extremely imbalanced situations (i.e., $p < 0.05$), but T-MLP(3) still outperforms most DNN baselines. Among DNNs, AutoInt[50] exhibits promising performances in the imbalance-class conditions, which may due to its capability of capturing patterns for minority class by manually combining original features to generate new features.
 
-# 💬 To R pAZD
+# 💬-To-R-pAZD
 
 <b>Q1: Constrained novelty since integration techniques from other fields (i.e., GBDT, vision MLPs, langue model pruning)?</b>
 
@@ -57,8 +61,8 @@ We follow the same paper style. Techniques from other fields are shoulders to pu
 **Overall Trend:** T-MLP can achieve SOTA competitive results as T2G-Former on its benchmark with an MLP-level (the first row) inference speed, and its ensemble version with 3 MLPs only takes around 15% more time in average, evidently faster than popular Transformer- or attention-based models (e.g., AutoInt, FT-Transformer, T2G-Former). Moreover, benefited from no hyperparameter tuning, T-MLP holds very controllable and stable inference time (all configs are static), while the searched best model configs of other existing tabular DNNs vary drastically as the random seed changes, especially with the large hyperparameter search space, that is why we repeat 15 random seeds and use the average results.
 
 **In-depth Analysis:** Essentially, for DNN part of T-MLP, the single-block MLP process only contains 4 matrix operations (3 matrix multiplications and 1 Hadamard product), here we omit non-parametric activation functions and normalization for clear analysis.
-- **operation 1 & 2:** $H = W_fXW_{h1} + b$, where $X \in \mathbb{R}^{F \times d}$ is the embedded input features of a sample, $W_{h1} \in \mathbb{R}^{d \times 2c}$ is transformation on the hidden dimension, $W_f \in \mathbb{R}^{F \times F}$ is transformation on feature dimension in SGU (Eq. 6), $b$ is the bias term combining the ones of $W_f$ and $ W_{h1}$;
-- **operation 3 & 4:** $\hat{H} = H_{:, :c}  \odot H_{:, c:} W_{h2}$, where $\odot$ is Hadamard product and $W_{h2} \in \mathbb{R}^{c \times d}$ is transformation on hidden dimension, $\hat{H}$ is used for final prediction. 
+- **operation 1 & 2:** $H = W_fXW_{h1} + b$, where $X \in \mathbb{R}^{F \times d}$ is the embedded input features of a sample, $W_{h1} \in \mathbb{R}^{d \times 2c}$ is transformation on the hidden dimension, $W_f \in \mathbb{R}^{F \times F}$ is transformation on feature dimension in SGU (Eq. 6), $b$ is the bias term combining the ones of $W_f$ and $W_{h1}$;
+- **operation 3 & 4:** $\hat{H} = H_{:, :c} \odot H_{:, c:} W_{h2}$, where $\odot$ is Hadamard product and $W_{h2} \in \mathbb{R}^{c \times d}$ is transformation on hidden dimension, $\hat{H}$ is used for final prediction. 
 - **For T-MLP ensemble version**, i.e., T-MLP(3), matrix reduction can be simply realized by contacting respective $W_f$, $W_{h1}$, $W_{h2}$ of 3 MLPs into the larger weight matrices once the weights are frozen (during inference), and the same 4 matrix operations can be performed to calculate 3 MLP processes simultaneously.
 - Since we uniformly use a sparsity rate of 0.33 (stated in line 1148), i.e., **around 67% values in the MLP weight matrices are zero**, which are sparse and can get inherent further acceleration by CUDA computation optimization.
 - For GBDT part, the trained XGBoost is converted into PyTorch tensor computation by [Microsoft Hummingbird compiling tools](https://github.com/microsoft/hummingbird), and this conversion operation has been done during training, in inference it only needs 3-step matrix multiplications with CUDA acceleration to complete the calculation (detailed mechanism illustration in its repo README).
@@ -375,7 +379,7 @@ Similar trend is observed additionally conducted ablations on FT-Transformer (11
 
 A5: (1) Please refer to QA1 of R hswh on how we determine the hyperparameter values, the default ones are listed in the page bottom. (2) We would like to briefly clarity the **fundamental misunderstandings** here. The introduced $z_h$ and $z_{in}$ are learnable binary masks for masking the corresponding values on MLP weight matrices, which sizes are adaptively determined by the sizes of weight matrices. The true & only hyperparameter in sparsification operation is the target sparsity rate, once it is assigned, the method will promise to produce the two variables with the assigned sparsity rate (target ratio of non-zero values) using CoFi pruning [62]. Secondly, as you said (also shown in Fig. 2), datasets vary in appetite of sparsity rates, we provide win statistics of different sparsity rates on T2G benchmark:
 
-<p style="text-align: center;"><b>Win statistics of different T-MLP sparsity rates on 12 T2G datasets</b></p>
+<p><b>Win statistics of different T-MLP sparsity rates on 12 T2G datasets</b></p>
 
 | Sparsity rate | 10% | 33% | 50% | 66% | 90% | 100% |
 | :------------ | :--: | :--: | :--: | :--: | :--: | :--: |
@@ -827,7 +831,7 @@ Sparsity rate here means how many weights remaining after pruning. The above res
 
 ## QA4: Insufficient analysis on the impact of GBDT or MLP parameters?
 <p align="center">
-  <img src="img/xgb-hp-analysis.png" alt="sym">
+  <img src="img/xgb-hp-analysis.png" alt="sym" width="60%">
     <figcaption style="text-align: center;">The imapct of decision tree count in XGBoost of T-MLP</figcaption>
 </p>
 
