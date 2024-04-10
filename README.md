@@ -36,8 +36,8 @@ Currently this page contains extra rebuttal contents of <b>submission 1763 *Team
 
 A1: Many successful interdisciplinary works stand on the shoulders of existing techniques from other fields
 
-- Vision Transformer (ViT []) incorporated the Transformer architecture to address long-distance pixel interaction in vision tasks.
-- TextCNN [] is a textbook-level model using stacked CNN to realize distant word dependency for sentence classification.
+- Vision Transformer (ViT) incorporated the Transformer architecture to address long-distance pixel interaction in vision tasks.
+- TextCNN is a textbook-level model using stacked CNN to realize distant word dependency for sentence classification.
 - For tabular data field:
     1. FT-T [23] adapted Transformer and BERT-like inference to tabular data learning.
     2. Recently, TabDDPM and TabR integrated diffusion models and k-Nearest-Neighbors algorithm respectively to tabular data prediction
@@ -379,7 +379,7 @@ Consequently, we can observe around 8~16 times inference speedup when using T-ML
 - Both the sparse MLP structure and the GBDT feature gate are improvement points for T-MLP; 
 - MLP sparsity often has a more profound impact than the GBDT feature gate on classification tasks, which may be explained by the underlying consistency between model sparsity and the discrete target nature of classification; 
 - The GBDT feature gate plays a more important role in regression since it has the capability of selecting salient features to alleviate the impact of noisy features, which may affect precise regression prediction; 
-- Our GBDT feature gate is often a better choice than the previously proposed neural feature gate (Neural FG, proposed for biomedical scenario) [] on general tabular data prediction.
+- Our GBDT feature gate is often a better choice than the previously proposed neural feature gate (Neural FG, proposed for biomedical scenario) [64] on general tabular data prediction.
 
 Similar trend is observed additionally conducted ablations on FT-Transformer (11 datasets) and SAINT (26 datasets) benchmarks, and we will include all detailed ablation results and analysis in the final version, thank you!
 
@@ -398,8 +398,97 @@ Sparsity rate here means how many weights remaining after pruning. The above res
 <a id="F2J2"></a>
 
 # 💬 To R F2J2
-- *2021.10* Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet ipsum, ac tempus justo dapibus sit amet. 
-- *2021.09* Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare aliquet ipsum, ac tempus justo dapibus sit amet. 
+
+## QA2: Why separate feature selection between training & inference?
+
+<p><b>Comparison with no feature selection separation (*) between training & inference</b></p>
+
+| T2G Dataset:  | GE⬆️   | CH⬆️   | EY⬆️   | CA⬇️   | HO⬇️   | AD⬆️   | OT⬆️   | HE⬆️   | JA⬆️   | HI⬆️   | FB⬇️   | YE⬇️   |
+| :------------ | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: |
+| T-MLP         | 0\.706 | 0\.862 | 0\.717 | 0\.449 | 3\.125 | 0\.864 | 0\.814 | 0\.386 | 0\.728 | 0\.729 | 5\.667 | 8\.768 |
+| T-MLP\*       | 0\.673 | 0\.862 | 0\.708 | 0\.462 | 3\.124 | 0\.864 | 0\.806 | 0\.384 | 0\.726 | 0\.729 | 5\.710 | 8\.792 |
+| T-MLP(3)      | 0\.714 | 0\.866 | 0\.747 | 0\.438 | 3\.063 | 0\.867 | 0\.823 | 0\.386 | 0\.732 | 0\.730 | 5\.629 | 8\.732 |
+| T-MLP\*(3)    | 0\.684 | 0\.861 | 0\.725 | 0\.446 | 3\.115 | 0\.867 | 0\.819 | 0\.386 | 0\.732 | 0\.729 | 5\.683 | 8\.757 |
+
+**Analysis:** Groups with * are directly trained with GDBT feature frequency as inference (not separating). An overall trend is that on most datasets, separating GBDT feature selection during training and inference often achieves stably better performances. Essentially, this can be explained by an implicit data augmentation mechanism, i.e., **increasing training difficulty by implicitly introducing randomly diverse data facets**. Such mechanism are widely adopted in many classical deep learning techniques, for example, **DropOut technique randomly discards some neuron outputs during training and retains all in inference**, this operation is equivalent to introducing randomness during the training to enrich facets of data hidden states and prevent overfitting; for white noise (Gaussian noise) augmentation, random noise is applied to input tabular data during training and not used in inference. **Similarly, we train GBDT feature selection process by sampling with GBDT feature frequency, which inherently build different facets** for each sample, increasing feature randomness and diversity during training for better overfitting resistance and generalization.
+
+## QA3: Comparison between SGU and other feature iteration method?
+
+<p><b>Comparison with self-attention mechanism (attn)</b></p>
+
+| T2G Dataset:  | GE⬆️   | CH⬆️   | EY⬆️   | CA⬇️   | HO⬇️   | AD⬆️   | OT⬆️   | HE⬆️   | JA⬆️   | HI⬆️   | FB⬇️   | YE⬇️   | T      | P(M)  |
+| :------------- | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :---: |
+| T-MLP          | 0\.706 | 0\.862 | 0\.717 | 0\.449 | 3\.125 | 0\.864 | 0\.814 | 0\.386 | 0\.728 | 0\.729 | 5\.667 | 8\.768 | x1\.00 | 0\.72 |
+| T-MLP(attn)    | 0\.708 | 0\.859 | 0\.723 | 0\.452 | 3\.120 | 0\.862 | 0\.806 | 0\.384 | 0\.724 | 0\.728 | 5\.710 | 8\.792 | x1\.68 | 2\.03 |
+| T-MLP(3)       | 0\.714 | 0\.866 | 0\.747 | 0\.438 | 3\.063 | 0\.867 | 0\.823 | 0\.386 | 0\.732 | 0\.730 | 5\.629 | 8\.732 | x1\.09 | 2\.16 |
+| T-MLP(attn)(3) | 0\.715 | 0\.864 | 0\.767 | 0\.447 | 3\.115 | 0\.867 | 0\.819 | 0\.386 | 0\.730 | 0\.730 | 5\.683 | 8\.773 | x1\.93 | 6\.10 |
+
+**Observations:** As suggested in the previous MLP-based architectures for CV and NLP tasks [12, 25, 54, 55], using self-attention in T-MLP has no significant difference on tabular prediction task performance while increasing training duration and parameter numbers on single T-MLP, and such complexity increasement is more severe when using T-MLP ensemble. A probable explanation is that the simple SGU structure has enough capacity to handle filtered sparse input features, while more complicated attention has no benefit on such sparse features with a risk of introducing noise from the unimportant features.
+
+**Analysis:** Our primary consideration on choosing SGU is to make model lightweight and computation efficient. Here we first analyze the complexity of computation and parameter for SGU and attention mechanism: Given $F$ input features with $d$ hidden size, the time complexity of attention consists of $QK^T$ multiplication (i.e., O($F \times F \times d$)=O($F^2d$)) and $(QK^T)V$ multiplication (i.e., O($F \times d \times F$)=O($F^2d$)), while the one of SGU is equivalent to the later part of attention, i.e., O($F \times d \times F$)=O($F^2d$), saving half of the computational complexity. When it comes to parameter requirement, attention needs O(3d^2) (i.e., $W_Q$, $W_K$, $W_V$), while SGU is O($F^2$). In most architecture studies of tabular model (also in our experiment), $F$ << $d$, thus SGU has a more profound advantage in parameter simplicity. Based on this insight, many pure-MLP works have been explored for efficient architectures in CV and NLP tasks which were on par with or even surpass attention-based Transformer. Besides, gMLP demonstrated performance on NLP tasks is insensitive to replacing self-attention in Transformer with an MLP-based alternative (i.e., SGU) [37].
+
+## QA4: Analysis on why faster than XGBoost?
+
+**For training**, XGBoost always require heavy hyperparameter tuning (HPT), for example, in the experiment of FT-Transformer [23] and T2G-Former [63], XGBoost required 100-iteration HPT, and in the known work of demonstrating GBDTs still outperforms DNNs in typical tabular regime [24], the used SOTA XGBoost performances were obtained after around 400 iterations of HPT. Contrarily, the XGBoost and single-block MLP used in our T-MLP are all kept in fixed hyperparameters, achieving SOTA competitive performances with only one-time training. For inference, since the XGBoost feature selection process is technically converted into PyTorch tensor computation with [Microsoft Hummingbird compiling tools](https://github.com/microsoft/hummingbird), all T-MLP inference process can be accelerated by CUDA operations in an end-to-end manner, while XGBoost still on CPU-GPU hybrid computation. Overall, T-MLP can achieve satisfactory results with faster training and inference than XGBoost
+
+
+## QA5: How about other baseline ensemble results on SAINT benchmark?
+
+Thank you for your rigorous consideration. Our T-MLP is designed for simplicity and no hyperparameter tuning (HPT) while achieving satisfactory results. On SAINT benchmark, single T-MLP & T-MLP(3) were only trained once, but the SAINT model results were obtained by costly pre-training with downstream HPT, and other strong GBDTs underwent 100-iteration HPT.
+
+Here we additionally compare ensemble results of other DNN baselines with T-MLP(3):
+
+<p><b>Rank (average values and standard deviations) comparison with other DNN ensemble</b></p>
+
+| SAINT Benchmark   | Binclass (9 datasets) | Multiclass (7 datasets) | Regression (10 datasets) |
+| :---------------- | :-------------------: | :---------------------: | :----------------------: |
+| MLP(3)            | 3\.28(0.67)           | 3\.50(0.87)             | 4\.50(0.58)              |
+| TabNet(3)         | 4\.78(0.67)           | 4\.50(0.50)             | 3\.70(1.09)              |
+| TabTransformer(3) | 3\.83(0.61)           | 3\.86(1.07)             | 3\.50(0.75)              |
+| SAINT(3)          | 1\.50(0.43)           | 1\.64(0.75)             | 1\.65(0.71)              |
+| hMLP(3)           | 1\.61(0.65)           | 1\.50(0.50)             | 1\.65(0.78)              |
+
+**Analysis:** An overall trend is that, even without considering pre-training budget of SAINT, T-MLP(3) is still a more cost-effective choice compared to SAINT(3) with negligible performance difference. A core reason of the superiority of T-MLP ensemble compared to other DNN counterparts is its controllable sparsity design in the MLP component, the 3 base MLP models in T-MLP(3) are learned with 3 different fixed learning rates, leading to their distinct and dynamical sparsity structures to increase model diversity and capacity, while other current tabular DNNs (e.g., SAINT, MLP) are using static neural structures, i.e., their architectures cannot be adaptively tailored as feature space or data distribution varies. Actually, the design of ensemble with simple sparse MLPs takes inspiration from GBDT structure, e.g., in XGBoost each CART tree has different pruned tree structure, and our T-MLP emulate such behavior to create GBDT-like simple MLPs.
+
+## QA6: Analysis on the correlation between T-MLP performance and data characteristics?
+
+To further inspect the impact of data characteristics on T-MLP performance, we create pivot tables by filtering datasets with training data volume, numerical feature numbers and categorical feature numbers on T2G-Former benchmark [63] and TabBen benchmark [24].
+
+**For training data volume impact**, we report the average ranks (standard deviations) in different volume ranges on 12 datasets from T2G benchmark as follows, where $N$ is training data volume:
+
+| T2G Benchmark  | $N$<10K (3 datasets) | $N$<50K (5 datasets) | $N$>=50K (4 datasets) |
+| :------------- | :----------------: | :----------------: | :-----------------: |
+| XGBoost        | 3\.7(1.2)          | 3\.4(3.4)          | 5\.8(3.8)           |
+| MLP            | 8\.7(1.5)          | 8\.4(1.7)          | 7\.8(2.6)           |
+| SNN            | 7\.0(1.7)          | 8\.6(1.5)          | 8\.8(1.0)           |
+| TabNet         | 9\.0(2.6)          | 10\.8(2.2)         | 10\.3(2.9)          |
+| DANet-28       | 9\.7(3.2)          | 10\.4(1.9)         | 11\.5(0.6)          |
+| NODE           | 8\.0(3.5)          | 8\.4(2.9)          | 4\.4(1.1)           |
+| AutoInt        | 10\.3(0.6)         | 7\.8(2.3)          | 6\.9(1.0)           |
+| DCNv2          | 9\.7(1.2)          | 7\.2(2.6)          | 8\.8(2.1)           |
+| FT-Transformer | 5\.3(1.5)          | 3\.8(2.2)          | 5\.3(3.9)           |
+| T2G-Former     | 2\.3(1.5)          | 3\.4(0.9)          | 3\.3(2.6)           |
+| T-MLP          | 3\.0(1.0)          | 3\.5(0.7)          | 3\.3(1.0)           |
+| T-MLP(3)       | 1\.3(0.6)          | 2\.3(0.3)          | 2\.3(1.0)           |
+
+**Analysis:** The overall trend exhibit a stably consistent superiority of T-MLP(3) in all data volume ranges, with two obvious observations: (1) Single T-MLP (without ensemble) performs better and is more SOTA competitive on large-volume datasets, which is benefited from its DNN properties, while XGBoost begins to fall behind in large datasets; (2) T-MLP benefits more from ensemble operation on small-volume datasets, which is intuitive since small training sets lead to unstable learning results and GBDT-like ensemble can boost both performance and stability.
+
+
+**For feature type impact**, we report the average ranks (standard deviations) in different categorical rates $\alpha$ (i.e., the proportion of categorical features to the total feature numbers, $\alpha$ = $\frac{C}{F}$, where $C$ is categorical feature amount, and $F$ is the total feature amount) on 16 datasets containing both numerical features and categorical ones from TabBen benchmark as follows:
+
+| TabBen       | **classification** <br> (3 datasets) <br> (0 < $\alpha$ < 0\.5) | **classification** <br> (3 datasets) <br> (0\.5 <= $\alpha$ <= 1) | **regression** <br> (5 datasets) <br> (0 < $\alpha$ < 0\.5) | **regression** <br> (5 datasets) <br> (0\.5 <= $\alpha$ <= 1) |
+| :----------- | :-------------------------------------------------- | :---------------------------------------------------- | :---------------------------------------------- | :------------------------------------------------ |
+| FT-T         | 5\.7(2.3)                                           | 5\.3(2.5)                                             | 6\.3(1.2)                                       | 7\.3(0.5)                                         |
+| ResNet       | 8\.7(0.6)                                           | 7\.0(0.0)                                             | 7\.7(0.5)                                       | 7\.8(0.5)                                         |
+| SAINT        | 7\.3(1.2)                                           | 8\.7(0.6)                                             | N/A                                             | N/A                                               |
+| GBT          | 5\.0(2.0)                                           | 5\.3(3.1)                                             | 4\.6(0.5)                                       | 4\.4(1.6)                                         |
+| HistGBT      | 3\.7(1.5)                                           | 6\.7(2.1)                                             | 4\.3(1.7)                                       | 4\.1(0.3)                                         |
+| RandomForest | 5\.3(3.5)                                           | 2\.7(2.3)                                             | 5\.8(2.6)                                       | 5\.9(0.3)                                         |
+| XGBoost      | 2\.0(1.7)                                           | 3\.7(0.6)                                             | 1\.6(0.9)                                       | 2\.8(0.5)                                         |
+| T-MLP        | 3\.7(2.5)                                           | 3\.3(2.5)                                             | 3\.9(1.0)                                       | 2\.6(1.3)                                         |
+| T-MLP(3)     | 3\.3(1.5)                                           | 2\.7(1.2)                                             | 1\.9(0.5)                                       | 1\.3(0.5)                                         |
+
+**Analysis:** According to the pivot results on dataset groups of different categorical rates and tasks, we have three key observations: When tabular datasets contain both categorical and numerical features, (1) the performance of T-MLP is likely to be improved as categorical features dominate the dataset (categorical rates increase), (2) XGBoost begins to fall behind when categorical rates increase, and (3) compared to classification tasks, T-MLP(3) performs more strongly on regression tasks, which may be benefited from its DNN properties, and XGBoost is relatively more powerful when numerical features dominate. Notably, all baseline results in the above table were acquired after hyperparameter tuning of around 400 iterations in the original paper settings, e.g., **XGBoost used around 1.3 hours to search its best configurations on 17-feature "house sales" dataset with 21.6 K samples, while T-MLP(3) only took less than 2 minutes to train. Such difference on cost-effectiveness will be more profound as data scale increases, which is one of our main contributions for carbon-friendly AI**.
 
 <a id="jHCg"></a>
 
@@ -845,7 +934,7 @@ Sparsity rate here means how many weights remaining after pruning. The above res
 
 ## QA4: Insufficient analysis on the impact of GBDT or MLP parameters?
 <p align="center">
-  <img src="img/xgb-hp-analysis.png" alt="sym" width="60%">
+  <img src="img/xgb-hp-analysis.png" alt="sym" width="550">
     <figcaption style="text-align: center;">The imapct of decision tree count in XGBoost of T-MLP</figcaption>
 </p>
 
